@@ -115,6 +115,7 @@ func DNSToMap(msg *dns.Msg, format string) (m map[string]interface{}) {
 	return m
 }
 
+// HTTPRequesToMap Converts HTTP Request to Matcher Map
 func HTTPRequesToMap(req *http.Request) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 	var headers string
@@ -145,6 +146,7 @@ func HTTPRequesToMap(req *http.Request) (map[string]interface{}, error) {
 	return m, nil
 }
 
+// HTTPResponseToMap Converts HTTP Response to Matcher Map
 func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 
