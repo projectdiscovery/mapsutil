@@ -132,16 +132,16 @@ func HTTPRequesToMap(req *http.Request) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-	m["body"] = body
+	m["body"] = string(body)
 
 	reqdump, err := httputil.DumpRequest(req, true)
 	if err != nil {
 		return nil, err
 	}
-
-	m["raw"] = string(reqdump)
+	reqdumpString := string(reqdump)
+	m["raw"] = reqdumpString
+	m["request"] = reqdumpString
 
 	return m, nil
 }
@@ -166,14 +166,13 @@ func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 		return nil, err
 	}
 	resp.Body.Close()
-
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-
-	m["all_headers"] = headers
-	m["body"] = body
+	m["body"] = string(body)
 
 	if r, err := httputil.DumpResponse(resp, true); err == nil {
-		m["raw"] = string(r)
+		responseString := string(r)
+		m["raw"] = responseString
+		m["response"] = responseString
 	}
 
 	return m, nil
