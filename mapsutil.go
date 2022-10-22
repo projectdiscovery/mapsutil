@@ -12,30 +12,16 @@ import (
 	"github.com/miekg/dns"
 )
 
-// MergeMaps into a new one
-func MergeMaps(m1, m2 map[string]interface{}) (m map[string]interface{}) {
-	m = make(map[string]interface{})
+// MergeMaps merges the inputted maps into a new one.
+// Be aware: In case of duplicated keys in multiple maps,
+// the one ending in the result is unknown a priori.
+func MergeMaps[K comparable, V any](maps ...map[K]V) (result map[K]V) {
+	result = make(map[K]V)
 
-	for k, v := range m1 {
-		m[k] = v
-	}
-
-	for k, v := range m2 {
-		m[k] = v
-	}
-
-	return
-}
-
-// MergeMapsWithStrings into a new string one
-func MergeMapsWithStrings(m1, m2 map[string]string) (m map[string]string) {
-	m = make(map[string]string)
-	for k, v := range m1 {
-		m[k] = v
-	}
-
-	for k, v := range m2 {
-		m[k] = v
+	for _, m := range maps {
+		for k, v := range m {
+			result[k] = v
+		}
 	}
 
 	return
