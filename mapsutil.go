@@ -178,14 +178,20 @@ func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 	return m, nil
 }
 
-// Difference returns the first map without the keys in common with the second one.
-func Difference(m1, m2 map[string]interface{}) (m map[string]interface{}) {
-	m = make(map[string]interface{})
+// GetKeys returns the map's keys.
+func GetKeys[K comparable, V any](m map[K]V) []K {
+	result := []K{}
+	for k := range m {
+		result = append(result, k)
+	}
 
-	for k, v := range m1 {
-		if v2 := m2[k]; v2 == nil {
-			m[k] = v
-		}
+	return result
+}
+
+// Difference returns the inputted map without the keys specified as input.
+func Difference[K comparable, V any](m map[K]V, keys ...K) map[K]V {
+	for _, key := range keys {
+		delete(m, key)
 	}
 
 	return m

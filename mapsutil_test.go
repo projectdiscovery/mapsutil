@@ -38,60 +38,46 @@ func TestHTTPResponseToMap(t *testing.T) {
 	// not implemented
 }
 
+func TestGetKeys(t *testing.T) {
+	t.Run("GetKeys(empty)", func(t *testing.T) {
+		got := GetKeys(map[string]interface{}{})
+		require.EqualValues(t, []string{}, got)
+	})
+
+	t.Run("GetKeys(string)", func(t *testing.T) {
+		got := GetKeys(map[string]interface{}{"a": "a", "b": "b"})
+		require.EqualValues(t, []string{"a", "b"}, got)
+	})
+
+	t.Run("GetKeys(int)", func(t *testing.T) {
+		got := GetKeys(map[int]interface{}{1: "a", 2: "b"})
+		require.EqualValues(t, []int{1, 2}, got)
+	})
+
+	t.Run("GetKeys(bool)", func(t *testing.T) {
+		got := GetKeys(map[bool]interface{}{true: "a", false: "b"})
+		require.EqualValues(t, []bool{true, false}, got)
+	})
+}
+
 func TestDifference(t *testing.T) {
-	tests := []struct {
-		name   string
-		inputA map[string]interface{}
-		inputB map[string]interface{}
-		want   map[string]interface{}
-	}{
-		{
-			name:   "single value",
-			inputA: map[string]interface{}{"a": "301"},
-			inputB: map[string]interface{}{},
-			want:   map[string]interface{}{"a": "301"},
-		},
-		{
-			name:   "empty value",
-			inputA: map[string]interface{}{"a": 1},
-			inputB: map[string]interface{}{"": ""},
-			want:   map[string]interface{}{"a": 1},
-		},
-		{
-			name:   "empty map",
-			inputA: map[string]interface{}{},
-			inputB: map[string]interface{}{},
-			want:   map[string]interface{}{},
-		},
-		{
-			name:   "different values",
-			inputA: map[string]interface{}{"a": true, "b": false, "c": true, "d": false},
-			inputB: map[string]interface{}{"c": "C", "d": "D"},
-			want:   map[string]interface{}{"a": true, "b": false},
-		},
-		{
-			name:   "differenceSTR",
-			inputA: map[string]interface{}{"a": "A", "b": "B", "c": "C", "d": "D"},
-			inputB: map[string]interface{}{"c": "C", "d": "D"},
-			want:   map[string]interface{}{"a": "A", "b": "B"},
-		},
-		{
-			name:   "differenceINT",
-			inputA: map[string]interface{}{"a": 1, "b": 2, "c": 3, "d": 4},
-			inputB: map[string]interface{}{"c": 3, "d": 4},
-			want:   map[string]interface{}{"a": 1, "b": 2},
-		},
-		{
-			name:   "differenceBOOL",
-			inputA: map[string]interface{}{"a": true, "b": false, "c": true, "d": false},
-			inputB: map[string]interface{}{"c": true, "d": false},
-			want:   map[string]interface{}{"a": true, "b": false},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := Difference(tt.inputA, tt.inputB)
-			require.Equal(t, tt.want, got)
-		})
-	}
+	t.Run("Difference(empty)", func(t *testing.T) {
+		got := Difference(map[string]interface{}{}, []string{}...)
+		require.EqualValues(t, map[string]interface{}{}, got)
+	})
+
+	t.Run("Difference(string)", func(t *testing.T) {
+		got := Difference(map[string]interface{}{"a": 1, "b": 2, "c": 3}, []string{"a"}...)
+		require.EqualValues(t, map[string]interface{}{"b": 2, "c": 3}, got)
+	})
+
+	t.Run("Difference(int)", func(t *testing.T) {
+		got := Difference(map[int]interface{}{1: "a", 2: "b", 3: "c"}, []int{1}...)
+		require.EqualValues(t, map[int]interface{}{2: "b", 3: "c"}, got)
+	})
+
+	t.Run("Difference(bool)", func(t *testing.T) {
+		got := Difference(map[bool]interface{}{true: 1, false: 2}, []bool{true}...)
+		require.EqualValues(t, map[bool]interface{}{false: 2}, got)
+	})
 }
