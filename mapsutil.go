@@ -3,7 +3,7 @@ package mapsutil
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"strings"
@@ -115,11 +115,11 @@ func HTTPRequesToMap(req *http.Request) (map[string]interface{}, error) {
 
 	m["all_headers"] = headers
 
-	body, err := ioutil.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		return nil, err
 	}
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	req.Body = io.NopCloser(bytes.NewBuffer(body))
 	m["body"] = string(body)
 
 	reqdump, err := httputil.DumpRequest(req, true)
@@ -148,12 +148,12 @@ func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 	}
 	m["all_headers"] = headers
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
-	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	resp.Body = io.NopCloser(bytes.NewBuffer(body))
 	m["body"] = string(body)
 
 	if r, err := httputil.DumpResponse(resp, true); err == nil {
