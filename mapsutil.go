@@ -177,3 +177,36 @@ func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 
 	return m, nil
 }
+
+// Flatten takes a map and returns a new one where nested maps are replaced
+// by dot-delimited keys.
+func Flatten(m map[string]any, separator string) map[string]any {
+	if separator == "" {
+		separator = "."
+	}
+	o := make(map[string]any)
+	for k, v := range m {
+		switch child := v.(type) {
+		case map[string]any:
+			nm := Flatten(child, separator)
+			for nk, nv := range nm {
+				o[k+separator+nk] = nv
+			}
+		default:
+			o[k] = v
+		}
+	}
+	return o
+}
+
+// Walk a map and visit all the edge key:value pairs
+func Walk(m map[string]any, callback func(k string, v any)) {
+	for k, v := range m {
+		switch child := v.(type) {
+		case map[string]any:
+			Walk(child, callback)
+		default:
+			callback(k, v)
+		}
+	}
+}
