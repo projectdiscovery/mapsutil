@@ -7,19 +7,18 @@ import (
 )
 
 func TestMergeMaps(t *testing.T) {
-	m1 := map[string]interface{}{"a": 1, "b": 2}
-	m2 := map[string]interface{}{"b": 2, "c": 3}
-	r := map[string]interface{}{"a": 1, "b": 2, "c": 3}
-	rr := MergeMaps(m1, m2)
-	require.Equal(t, r, rr)
-}
+	m1Str := map[string]interface{}{"a": 1, "b": 2}
+	m2Str := map[string]interface{}{"b": 2, "c": 3}
+	rStr := map[string]interface{}{"a": 1, "b": 2, "c": 3}
+	rrStr := MergeMaps(m1Str, m2Str)
+	require.EqualValues(t, rStr, rrStr)
 
-func TestMergeMapsWithStrings(t *testing.T) {
-	m1 := map[string]string{"a": "a", "b": "b"}
-	m2 := map[string]string{"b": "b", "c": "c"}
-	r := map[string]string{"a": "a", "b": "b", "c": "c"}
-	rr := MergeMapsWithStrings(m1, m2)
-	require.Equal(t, r, rr)
+	m1Int := map[int]interface{}{1: 1, 2: 2}
+	m2Int := map[int]interface{}{1: 1, 2: 2, 3: 3, 4: 4}
+	m3Int := map[int]interface{}{1: 1, 5: 5}
+	rInt := map[int]interface{}{1: 1, 2: 2, 3: 3, 4: 4, 5: 5}
+	rrInt := MergeMaps(m1Int, m2Int, m3Int)
+	require.EqualValues(t, rInt, rrInt)
 }
 
 func TestHTTPToMap(t *testing.T) {

@@ -10,32 +10,19 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
+	extmaps "golang.org/x/exp/maps"
 )
 
-// MergeMaps into a new one
-func MergeMaps(m1, m2 map[string]interface{}) (m map[string]interface{}) {
-	m = make(map[string]interface{})
+// MergeMaps merges the inputted maps into a new one.
+// Be aware: In case of duplicated keys in multiple maps,
+// the one ending in the result is unknown a priori.
+func MergeMaps[K comparable, V any](maps ...map[K]V) (result map[K]V) {
+	result = make(map[K]V)
 
-	for k, v := range m1 {
-		m[k] = v
-	}
-
-	for k, v := range m2 {
-		m[k] = v
-	}
-
-	return
-}
-
-// MergeMapsWithStrings into a new string one
-func MergeMapsWithStrings(m1, m2 map[string]string) (m map[string]string) {
-	m = make(map[string]string)
-	for k, v := range m1 {
-		m[k] = v
-	}
-
-	for k, v := range m2 {
-		m[k] = v
+	for _, m := range maps {
+		for k, v := range m {
+			result[k] = v
+		}
 	}
 
 	return
@@ -179,13 +166,21 @@ func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 }
 
 // GetKeys returns the map's keys.
-func GetKeys[K comparable, V any](m map[K]V) []K {
-	result := []K{}
-	for k := range m {
-		result = append(result, k)
+func GetKeys[K comparable, V any](maps ...map[K]V) []K {
+	var keys []K
+	for _, m := range maps {
+		keys = append(keys, extmaps.Keys(m)...)
 	}
+	return keys
+}
 
-	return result
+// GetValues returns the map's values.
+func GetValues[K comparable, V any](maps ...map[K]V) []V {
+	var values []V
+	for _, m := range maps {
+		values = append(values, extmaps.Values(m)...)
+	}
+	return values
 }
 
 // Difference returns the inputted map without the keys specified as input.
@@ -195,4 +190,37 @@ func Difference[K comparable, V any](m map[K]V, keys ...K) map[K]V {
 	}
 
 	return m
+}
+
+// Flatten takes a map and returns a new one where nested maps are replaced
+// by dot-delimited keys.
+func Flatten(m map[string]any, separator string) map[string]any {
+	if separator == "" {
+		separator = "."
+	}
+	o := make(map[string]any)
+	for k, v := range m {
+		switch child := v.(type) {
+		case map[string]any:
+			nm := Flatten(child, separator)
+			for nk, nv := range nm {
+				o[k+separator+nk] = nv
+			}
+		default:
+			o[k] = v
+		}
+	}
+	return o
+}
+
+// Walk a map and visit all the edge key:value pairs
+func Walk(m map[string]any, callback func(k string, v any)) {
+	for k, v := range m {
+		switch child := v.(type) {
+		case map[string]any:
+			Walk(child, callback)
+		default:
+			callback(k, v)
+		}
+	}
 }
