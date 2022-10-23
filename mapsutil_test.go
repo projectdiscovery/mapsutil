@@ -40,7 +40,7 @@ func TestHTTPResponseToMap(t *testing.T) {
 func TestGetKeys(t *testing.T) {
 	t.Run("GetKeys(empty)", func(t *testing.T) {
 		got := GetKeys(map[string]interface{}{})
-		require.EqualValues(t, []string{}, got)
+		require.Empty(t, got)
 	})
 
 	t.Run("GetKeys(string)", func(t *testing.T) {
@@ -56,6 +56,28 @@ func TestGetKeys(t *testing.T) {
 	t.Run("GetKeys(bool)", func(t *testing.T) {
 		got := GetKeys(map[bool]interface{}{true: "a", false: "b"})
 		require.EqualValues(t, []bool{true, false}, got)
+	})
+}
+
+func TestGetValues(t *testing.T) {
+	t.Run("GetValues(empty)", func(t *testing.T) {
+		got := GetValues(map[string]interface{}{})
+		require.Empty(t, got)
+	})
+
+	t.Run("GetValues(string)", func(t *testing.T) {
+		got := GetValues(map[string]interface{}{"a": "a", "b": "b"})
+		require.EqualValues(t, []interface{}{"a", "b"}, got)
+	})
+
+	t.Run("GetValues(int)", func(t *testing.T) {
+		got := GetValues(map[string]interface{}{"a": 1, "b": 2})
+		require.EqualValues(t, []interface{}{1, 2}, got)
+	})
+
+	t.Run("GetValues(bool)", func(t *testing.T) {
+		got := GetValues(map[string]interface{}{"a": true, "b": false})
+		require.EqualValues(t, []interface{}{true, false}, got)
 	})
 }
 
