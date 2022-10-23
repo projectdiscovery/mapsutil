@@ -3,13 +3,14 @@ package mapsutil
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"strings"
 	"time"
 
 	"github.com/miekg/dns"
+	extmaps "golang.org/x/exp/maps"
 )
 
 // MergeMaps merges the inputted maps into a new one.
@@ -114,11 +115,11 @@ func HTTPRequesToMap(req *http.Request) (map[string]interface{}, error) {
 
 	m["all_headers"] = headers
 
-	body, err := ioutil.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		return nil, err
 	}
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	req.Body = io.NopCloser(bytes.NewBuffer(body))
 	m["body"] = string(body)
 
 	reqdump, err := httputil.DumpRequest(req, true)
@@ -147,12 +148,12 @@ func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 	}
 	m["all_headers"] = headers
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	resp.Body.Close()
-	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	resp.Body = io.NopCloser(bytes.NewBuffer(body))
 	m["body"] = string(body)
 
 	if r, err := httputil.DumpResponse(resp, true); err == nil {
@@ -162,6 +163,33 @@ func HTTPResponseToMap(resp *http.Response) (map[string]interface{}, error) {
 	}
 
 	return m, nil
+}
+
+// GetKeys returns the map's keys.
+func GetKeys[K comparable, V any](maps ...map[K]V) []K {
+	var keys []K
+	for _, m := range maps {
+		keys = append(keys, extmaps.Keys(m)...)
+	}
+	return keys
+}
+
+// GetValues returns the map's values.
+func GetValues[K comparable, V any](maps ...map[K]V) []V {
+	var values []V
+	for _, m := range maps {
+		values = append(values, extmaps.Values(m)...)
+	}
+	return values
+}
+
+// Difference returns the inputted map without the keys specified as input.
+func Difference[K comparable, V any](m map[K]V, keys ...K) map[K]V {
+	for _, key := range keys {
+		delete(m, key)
+	}
+
+	return m
 }
 
 // Flatten takes a map and returns a new one where nested maps are replaced
