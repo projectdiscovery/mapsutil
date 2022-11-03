@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/miekg/dns v1.1.50
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	golang.org/x/exp v0.0.0-20221019170559-20944726eadf
 )
 
