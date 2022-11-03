@@ -68,9 +68,11 @@ func TestMergeMaps(t *testing.T) {
 
 func TestHTTPToMap(t *testing.T) {
 	bufBody := new(strings.Builder)
+	// nolint:errcheck
 	io.Copy(bufBody, resp.Body)
 
 	bufHeaders := new(strings.Builder)
+	// nolint:errcheck
 	io.Copy(bufHeaders, resp.Body)
 
 	m := HTTPToMap(resp, bufBody.String(), bufHeaders.String(), time.Duration(2), "")
