@@ -1,3 +1,4 @@
+// Deprecated: use github.com/projectdiscovery/utils/maps instead
 module github.com/projectdiscovery/mapsutil
 
 go 1.18
